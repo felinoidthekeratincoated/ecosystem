@@ -1,0 +1,17 @@
+{
+    "species": 3,
+    "size": 4000,
+    "resources":
+    [{
+        "type": 8,
+        "consumption": 0.5,
+        "affinity": 1
+    },
+    {
+        "type": 9,
+        "consumption": -10,
+        "affinity": 2
+    }],
+    "prey": [],
+    "reproduction_rate": 1.005
+}
