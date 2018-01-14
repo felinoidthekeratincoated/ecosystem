@@ -23,5 +23,5 @@
         "affinity": 1
     }],
     "prey": [],
-    "reproduction_rate": 1.02
+    "change_rate": 1.02
 }

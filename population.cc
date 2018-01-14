@@ -15,5 +15,5 @@ void from_json(const json &j, Population &p) {
     p.size = j["size"];
     p.resources = j["resources"].get<vector<Resource>>();
     p.prey = j["prey"].get<vector<Prey>>();
-    p.reproduction_rate = j["reproduction_rate"];
+    p.change_rate = j["change_rate"];
 }

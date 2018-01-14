@@ -10,11 +10,12 @@ using json = nlohmann::json;
 using namespace std;
 
 Ecosystem::Ecosystem() {
-    // For now, the file names are hard coded
-    string pop_folder = "pop/";
     string suffix = ".json";
-    vector<string> filenames = {"grass", "buttercup", "clover", "honeybee",
-        "bison", "wolf"};
+
+    ifstream files("files.json");
+    json f = json::parse(files);
+    vector<string> filenames = f["files"].get<vector<string>>();
+    string pop_folder = f["path"];
 
     for (unsigned int i = 0; i < filenames.size(); i++) {
         /* open file */
@@ -27,6 +28,10 @@ Ecosystem::Ecosystem() {
     }
 }
 
+Ecosystem::Ecosystem(vector<Population> &populations) {
+    pops = populations;
+}
+
 /* Update the populations. */
 void Ecosystem::Update() {
     // Temporary fix: hardcode the amount of resources
@@ -36,11 +41,16 @@ void Ecosystem::Update() {
 }
 
 /* Output to a file, csv format. */
-void Ecosystem::Output(ofstream &file) {
+void Ecosystem::Output(ofstream &file) const {
     for (unsigned int i = 0; i < pops.size(); i++) {
         file << pops[i].size << ",";
     }
     file << "\n";
+}
+
+/* Get the status of a givem population. */
+Population Ecosystem::Get(Species species) const {
+    return pops[(int)species];
 }
 
 /* Use each resource. */
@@ -133,9 +143,9 @@ void Ecosystem::catchPrey() {
     }
 }
 
-/* Grow all populations by reproduction_rate. */
+/* Grow all populations by change_rate. */
 void Ecosystem::reproduce() {
     for (unsigned int i = 0; i < pops.size(); i++) {
-        pops[i].size *= pops[i].reproduction_rate;
+        pops[i].size *= pops[i].change_rate;
     }
 }

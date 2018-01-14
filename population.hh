@@ -14,7 +14,9 @@ enum class Species {
     BUTTERCUP,
     CLOVER,
     HONEYBEE,
-    COW
+    BISON,
+    WOLF,
+    GRASSHOPPER
 };
 
 struct Population {
@@ -23,7 +25,7 @@ public:
     double size;
     std::vector<Resource> resources;
     std::vector<Prey> prey;
-    double reproduction_rate;
+    double change_rate;
 };
 
 void from_json(const json &j, Population &p);

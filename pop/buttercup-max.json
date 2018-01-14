@@ -1,6 +1,6 @@
 {
     "species": 1,
-    "size": 200000,
+    "size": 500000,
     "resources":
     [{
         "type": 1,
@@ -23,5 +23,5 @@
         "affinity": 1
     }],
     "prey": [],
-    "change_rate": 1.05
+    "change_rate": 1.07
 }

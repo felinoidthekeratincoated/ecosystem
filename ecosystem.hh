@@ -16,8 +16,10 @@ private:
     void reproduce();
 public:
     Ecosystem();
+    Ecosystem(vector<Population> &populations);
     void Update();
-    void Output(ofstream &file);
+    void Output(ofstream &file) const;
+    Population Get(Species species) const;
 };
 
 

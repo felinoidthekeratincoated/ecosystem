@@ -1,0 +1,22 @@
+{
+    "species": 6,
+    "size": 500,
+    "resources": [],
+    "prey": 
+    [{
+        "species": 0,
+        "consumption": 1,
+        "catch_rate": 0.0000005
+    },
+    {
+        "species": 1,
+        "consumption": 2,
+        "catch_rate": 0.0000001
+    },
+    {
+        "species": 2,
+        "consumption": 1,
+        "catch_rate": 0.0000002
+    }],
+    "change_rate": 0.98
+}

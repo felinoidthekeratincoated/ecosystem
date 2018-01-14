@@ -1,11 +1,11 @@
 {
-    "species": 1,
-    "size": 200000,
+    "species": 2,
+    "size": 350000,
     "resources":
     [{
         "type": 1,
         "consumption": 1,
-        "affinity": 1
+        "affinity": 1.03
     },
     {
         "type": 8,
@@ -15,13 +15,13 @@
     {
         "type": 9,
         "consumption": 1,
-        "affinity": 1
+        "affinity": 1.05
     },
     {
         "type": 10,
-        "consumption": 1,
+        "consumption": -1,
         "affinity": 1
     }],
     "prey": [],
-    "change_rate": 1.05
+    "change_rate": 1.03
 }
