@@ -43,13 +43,56 @@ double Solver::randrange(double low, double high) {
    at the target levels. */
 double Solver::getError(const Ecosystem &eco) {
     double error = 0;
-    for (unsigned int i = 0; i < min_pops.size(); i++) {
+    for (unsigned int i = 0; i < min_goal.size(); i++) {
         double size = eco.Get((Species)i).size;
-        double over = size / max_pops[i].size;
-        double under = min_pops[i].size / size;
+        double over = size / max_goal[i].size;
+        double under = min_goal[i].size / size;
         error += max(over * over, under * under);
     }
     return error;
+}
+
+/* Change the max and min so population sets like the ones given are more
+likely to occur. */
+void Solver::moveBounds(const vector<vector<Population>> &new_bounds) {
+    assert(new_bounds.size() > 0);
+    min_pops = new_bounds[0];
+    max_pops = new_bounds[0];
+    for (unsigned int i = 1; i < new_bounds.size(); i++) {
+        for (unsigned int j = 0; j < min_pops.size(); j++) {
+            min_pops[j].setMin(new_bounds[i][j]);
+            max_pops[j].setMax(new_bounds[i][j]);
+        }
+    }
+}
+
+/* Remove all but the best population sets, measured by the error vector. 
+Modifies the vector of population vectors in place. */
+vector<vector<Population>> &Solver::keepBest(vector<vector<Population>> &pops,
+        vector<double> &errors, int keep) {
+    assert(pops.size() == errors.size());
+    assert(keep < (int)pops.size());
+    for (unsigned int i = keep; i < pops.size(); i++) {
+        for (int j = 0; j < keep; j++) {
+            if (errors[i] < errors[j]) {
+                // Switch their positions
+                double temp = errors[i];
+                errors[i] = errors[j];
+                errors[j] = temp;
+                vector<Population> temppop = pops[i];
+                pops[i] = pops[j];
+                pops[j] = temppop;
+                // And redo in case the displaced one really does belong
+                // at the top
+                i--;
+            }
+        }
+    }
+    // Remove all but the best ones from pops
+    pops.erase(pops.begin() + keep, pops.end());
+    errors.erase(errors.begin() + keep, errors.end());
+    assert(pops.size() == errors.size());
+    return pops;
 }
 
 /* Constructor. */
@@ -67,24 +110,10 @@ Solver::Solver() {
     vector<string> filenames = f["files"].get<vector<string>>();
     string pop_folder = f["path"];
 
-    for (unsigned int i = 0; i < filenames.size(); i++) {
-        /* open file */
-        ifstream infile(pop_folder + filenames[i] + "-min" + suffix);
-        /* Put data in json. */
-        json j = json::parse(infile);
-        int index = j["species"];
-        min_pops.resize(max((int)min_pops.size(), index + 1));
-        min_pops[index] = j.get<Population>();
-    }
-    for (unsigned int i = 0; i < filenames.size(); i++) {
-        /* open file */
-        ifstream infile(pop_folder + filenames[i] + "-max" + suffix);
-        /* Put data in json. */
-        json j = json::parse(infile);
-        int index = j["species"];
-        max_pops.resize(max((int)max_pops.size(), index + 1));
-        max_pops[index] = j.get<Population>();
-    }
+    min_pops = Population::loadPops(pop_folder, filenames, "-min" + suffix);
+    min_goal = min_pops;
+    max_pops = Population::loadPops(pop_folder, filenames, "-max" + suffix);
+    max_goal = max_pops;
     assert(min_pops.size() == max_pops.size());
 }
 
@@ -100,14 +129,42 @@ vector<Population> Solver::generate() {
 and outputs the result to a file, as well as printing a measurement of how
 badly that ecosystem did. */
 void Solver::Solve() {
-    vector<Population> test = generate();
-    Ecosystem eco(test);
+    unsigned int num_pops = 40;
+    int num_kept = 10;
+    int generations = 5;
+    vector<vector<Population>> test;
+    vector<double> errors;
+    assert(test.size() == 0);
+
+    for (int i = 0; i < generations; i++) {
+        while (test.size() < num_pops) {
+            assert(test.size() == errors.size());
+            test.push_back(generate());
+            Ecosystem eco(test.back());
+            double error = 0;
+            for (int k = 0; k < iterations; k++) {
+                eco.Update();
+                error += getError(eco);
+            }
+            // Set the population to the ending population
+            for (unsigned int k = 0; k < test.back().size(); k++) {
+                test.back()[k].size = eco.Get((Species)k).size;
+            }
+            errors.push_back(error);
+            assert(test.size() == errors.size());
+        }
+        assert(test.size() == errors.size());
+        test = keepBest(test, errors, num_kept);
+        moveBounds(test);
+        cout << "generation " << i << " done.\n";
+    }
+
+    test = keepBest(test, errors, 1);
+    Ecosystem eco(test[0]);
     ofstream file("out.csv");
-    double error = 0;
-    for (int i = 0; i < iterations; i++) {
+    for (int j = 0; j < iterations; j++) {
         eco.Update();
         eco.Output(file);
-        error += getError(eco);
     }
-    cout << "Sum squared error: " << error << "\n";
+    cout << "Sum squared error: " << errors[0] << "\n";
 }
