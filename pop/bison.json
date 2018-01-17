@@ -1,17 +1,1 @@
-{
-    "species": 4,
-    "size": 500,
-    "resources": [],
-    "prey": 
-    [{
-        "species": 0,
-        "consumption": 90,
-        "catch_rate": 0.00005
-    },
-    {
-        "species": 2,
-        "consumption": 90,
-        "catch_rate": 0.00005
-    }],
-    "change_rate": 0.98
-}
+{"change_rate":0.977494268349258,"prey":[{"catch_rate":3.17317847346119e-05,"consumption":36.4141565301464,"species":0},{"catch_rate":3.7620164688278e-05,"consumption":57.2504663818005,"species":2}],"resources":[],"size":122.245944844122,"species":4}

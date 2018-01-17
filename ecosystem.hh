@@ -20,6 +20,8 @@ public:
     void Update();
     void Output(ofstream &file) const;
     Population Get(Species species) const;
+    static vector<string> GetFilenames(string &prefix, string &suffix);
+    void Save();
 };
 
 

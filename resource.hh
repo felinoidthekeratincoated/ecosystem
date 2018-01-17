@@ -29,5 +29,6 @@ public:
 };
 
 void from_json(const json &j, Resource &resource);
+void to_json(json &j, const Resource &r);
 
 #endif

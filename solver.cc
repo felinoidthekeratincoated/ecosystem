@@ -46,7 +46,10 @@ double Solver::getError(const Ecosystem &eco) {
     for (unsigned int i = 0; i < min_goal.size(); i++) {
         double size = eco.Get((Species)i).size;
         double over = size / max_goal[i].size;
-        double under = min_goal[i].size / size;
+        double under = 0;
+        if (max_goal[i].size != 0) {
+            under = min_goal[i].size / size;
+        }
         error += max(over * over, under * under);
     }
     return error;
@@ -85,6 +88,7 @@ vector<vector<Population>> &Solver::keepBest(vector<vector<Population>> &pops,
                 // And redo in case the displaced one really does belong
                 // at the top
                 i--;
+                break;
             }
         }
     }
@@ -103,12 +107,10 @@ Solver::Solver() {
 
     iterations = 4000;
 
-    string suffix = ".json";
+    string suffix;
+    string pop_folder;
 
-    ifstream files("files.json");
-    json f = json::parse(files);
-    vector<string> filenames = f["files"].get<vector<string>>();
-    string pop_folder = f["path"];
+    vector<string> filenames = Ecosystem::GetFilenames(pop_folder, suffix);
 
     min_pops = Population::loadPops(pop_folder, filenames, "-min" + suffix);
     min_goal = min_pops;
@@ -131,7 +133,7 @@ badly that ecosystem did. */
 void Solver::Solve() {
     unsigned int num_pops = 40;
     int num_kept = 10;
-    int generations = 5;
+    int generations = 8;
     vector<vector<Population>> test;
     vector<double> errors;
     assert(test.size() == 0);
@@ -161,6 +163,7 @@ void Solver::Solve() {
 
     test = keepBest(test, errors, 1);
     Ecosystem eco(test[0]);
+    eco.Save();
     ofstream file("out.csv");
     for (int j = 0; j < iterations; j++) {
         eco.Update();

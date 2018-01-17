@@ -1,17 +1,1 @@
-{
-    "species": 3,
-    "size": 4000,
-    "resources":
-    [{
-        "type": 8,
-        "consumption": 0.5,
-        "affinity": 1
-    },
-    {
-        "type": 9,
-        "consumption": -10,
-        "affinity": 2
-    }],
-    "prey": [],
-    "change_rate": 1.005
-}
+{"change_rate":1.005,"prey":[],"resources":[{"affinity":1.0,"consumption":0.5,"type":8},{"affinity":1.0,"consumption":-10.0,"type":9}],"size":12069.6724721439,"species":3}

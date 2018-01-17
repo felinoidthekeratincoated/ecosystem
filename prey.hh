@@ -15,5 +15,6 @@ public:
 };
 
 void from_json(const json &j, Prey &prey);
+void to_json(json &j, const Prey &prey);
 
 #endif

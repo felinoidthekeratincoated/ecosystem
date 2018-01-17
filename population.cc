@@ -10,6 +10,11 @@ using json = nlohmann::json;
 
 using namespace std;
 
+/* Constructor. */
+Population::Population() {
+    size = 0;
+}
+
 /* Set each value to the value *this or pop has, whichever is smaller. */
 void Population::setMin(const Population &pop) {
     assert(species == pop.species);
@@ -72,4 +77,13 @@ void from_json(const json &j, Population &p) {
     p.resources = j["resources"].get<vector<Resource>>();
     p.prey = j["prey"].get<vector<Prey>>();
     p.change_rate = j["change_rate"];
+}
+
+/* Save to a json file. */
+void to_json(json &j, const Population &p) {
+    j["species"] = (int)p.species;
+    j["size"] = p.size;
+    j["resources"] = p.resources;
+    j["prey"] = p.prey;
+    j["change_rate"] = p.change_rate;
 }

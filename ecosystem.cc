@@ -10,12 +10,9 @@ using json = nlohmann::json;
 using namespace std;
 
 Ecosystem::Ecosystem() {
-    string suffix = ".json";
-
-    ifstream files("files.json");
-    json f = json::parse(files);
-    vector<string> filenames = f["files"].get<vector<string>>();
-    string pop_folder = f["path"];
+    string pop_folder;
+    string suffix;
+    vector<string> filenames = GetFilenames(pop_folder, suffix);
 
     for (unsigned int i = 0; i < filenames.size(); i++) {
         /* open file */
@@ -51,6 +48,29 @@ void Ecosystem::Output(ofstream &file) const {
 /* Get the status of a givem population. */
 Population Ecosystem::Get(Species species) const {
     return pops[(int)species];
+}
+
+/* Gets a list of all filenames of populations, in order, and changes the 
+string prefix to be the path to the files and suffix to be the extension. */
+vector<string> Ecosystem::GetFilenames(string &prefix, string &suffix) {
+    suffix = ".json";
+
+    ifstream files("files.json");
+    json f = json::parse(files);
+    vector<string> filenames = f["files"].get<vector<string>>();
+    prefix = f["path"];
+    return filenames;
+}
+
+/* Saves all populations to json files. */
+void Ecosystem::Save() {
+    string prefix, suffix;
+    vector<string> filenames = Ecosystem::GetFilenames(prefix, suffix);
+    for (unsigned int i = 0; i < filenames.size(); i++) {
+        ofstream file(prefix + filenames[i] + suffix);
+        json j = pops[i];
+        file << j;
+    }
 }
 
 /* Use each resource. */
