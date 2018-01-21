@@ -10,17 +10,20 @@ using namespace std;
 class Ecosystem {
 private:
     vector<Population> pops;
+    vector<double> resources;
     double useResource(ResourceType resource, double amount);
     void useResources();
     void catchPrey();
     void reproduce();
 public:
-    Ecosystem();
-    Ecosystem(vector<Population> &populations);
+    Ecosystem(string biome);
+    Ecosystem(vector<Population> &populations, vector<double> &resources);
     void Update();
     void Output(ofstream &file) const;
+    void WriteNames(ofstream &file) const;
     Population Get(Species species) const;
-    static vector<string> GetFilenames(string &prefix, string &suffix);
+    static vector<string> GetFilenames(string &pop_prefix, string &bio_prefix,
+        string &suffix);
     void Save();
 };
 

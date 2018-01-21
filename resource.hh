@@ -7,18 +7,17 @@
 using json = nlohmann::json;
 
 enum class ResourceType {
-    WOODLAND,
-    GRASSLAND,
-    DESERT,
-    SCRUB,
-    SAVANNAH,
-    JUNGLE,
-    TAIGA,
-    TUNDRA,
+    SHADE,
+    SUN,
+    SHALLOW_WATER,
+    MEDIUM_WATER,
+    DEEP_WATER,
+    SURFACE_WATER,
+    UNUSED,
+    UNUSED_,
     INSECT_POLLINATED_FLOWER,
     INSECT_POLLINATION,
-    NITROGEN,
-    WATER
+    NITROGEN
 };
 
 struct Resource {

@@ -45,10 +45,10 @@ double Solver::getError(const Ecosystem &eco) {
     double error = 0;
     for (unsigned int i = 0; i < min_goal.size(); i++) {
         double size = eco.Get((Species)i).size;
-        double over = size / max_goal[i].size;
+        double over = size / max_goal[i];
         double under = 0;
-        if (max_goal[i].size != 0) {
-            under = min_goal[i].size / size;
+        if (max_goal[i] > 0) {
+            under = min_goal[i] / size;
         }
         error += max(over * over, under * under);
     }
@@ -74,7 +74,7 @@ Modifies the vector of population vectors in place. */
 vector<vector<Population>> &Solver::keepBest(vector<vector<Population>> &pops,
         vector<double> &errors, int keep) {
     assert(pops.size() == errors.size());
-    assert(keep < (int)pops.size());
+    assert(keep <= (int)pops.size());
     for (unsigned int i = keep; i < pops.size(); i++) {
         for (int j = 0; j < keep; j++) {
             if (errors[i] < errors[j]) {
@@ -100,25 +100,36 @@ vector<vector<Population>> &Solver::keepBest(vector<vector<Population>> &pops,
 }
 
 /* Constructor. */
-Solver::Solver() {
+Solver::Solver(string biome) {
     // Seed the random number generators
     srand(time(nullptr));
     engine.seed(rand());
 
-    iterations = 4000;
+    string suffix, pop_folder, bio_folder;
 
-    string suffix;
-    string pop_folder;
+    vector<string> filenames = Ecosystem::GetFilenames(pop_folder, bio_folder, 
+            suffix);
 
-    vector<string> filenames = Ecosystem::GetFilenames(pop_folder, suffix);
+    ifstream biometype(bio_folder + biome + suffix);
+    json b = json::parse(biometype);
+    resources = b["resources"].get<vector<double>>();
+    min_goal = b["min_goal"].get<vector<double>>();
+    max_goal = b["max_goal"].get<vector<double>>();
 
     min_pops = Population::loadPops(pop_folder, filenames, "-min" + suffix);
-    min_goal = min_pops;
     max_pops = Population::loadPops(pop_folder, filenames, "-max" + suffix);
-    max_goal = max_pops;
     assert(min_pops.size() == max_pops.size());
+    assert(min_goal.size() == max_goal.size());
+    assert(min_pops.size() == max_pops.size());
+    for (unsigned int i = 0; i < min_pops.size(); i++) {
+        min_pops[i].size = min_goal[i];
+        max_pops[i].size = max_goal[i];
+    }
+
+    
 }
 
+/* Generates a random population of each species. */
 vector<Population> Solver::generate() {
     vector<Population> answer;
     for (unsigned int i = 0; i < min_pops.size(); i++) {
@@ -130,10 +141,8 @@ vector<Population> Solver::generate() {
 /* For now, this generates random populations, runs the resulting ecosystem,
 and outputs the result to a file, as well as printing a measurement of how
 badly that ecosystem did. */
-void Solver::Solve() {
-    unsigned int num_pops = 40;
-    int num_kept = 10;
-    int generations = 8;
+void Solver::Solve(int iterations, unsigned int num_pops, int num_kept, 
+        int generations) {
     vector<vector<Population>> test;
     vector<double> errors;
     assert(test.size() == 0);
@@ -142,7 +151,7 @@ void Solver::Solve() {
         while (test.size() < num_pops) {
             assert(test.size() == errors.size());
             test.push_back(generate());
-            Ecosystem eco(test.back());
+            Ecosystem eco(test.back(), resources);
             double error = 0;
             for (int k = 0; k < iterations; k++) {
                 eco.Update();
@@ -162,9 +171,10 @@ void Solver::Solve() {
     }
 
     test = keepBest(test, errors, 1);
-    Ecosystem eco(test[0]);
+    Ecosystem eco(test[0], resources);
     eco.Save();
     ofstream file("out.csv");
+    eco.WriteNames(file);
     for (int j = 0; j < iterations; j++) {
         eco.Update();
         eco.Output(file);

@@ -5,18 +5,18 @@
     "prey": 
     [{
         "species": 0,
-        "consumption": 0.5,
-        "catch_rate": 0.000000005
+        "consumption": 0.1,
+        "catch_rate": 0.00000000005
     },
     {
         "species": 1,
-        "consumption": 1,
-        "catch_rate": 0.000000001
+        "consumption": 0.15,
+        "catch_rate": 0.00000000001
     },
     {
         "species": 2,
-        "consumption": 1,
-        "catch_rate": 0.000000002
+        "consumption": 0.15,
+        "catch_rate": 0.00000000002
     }],
-    "change_rate": 0.96
+    "change_rate": 0.97
 }

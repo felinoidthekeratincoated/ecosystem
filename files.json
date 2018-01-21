@@ -1,5 +1,6 @@
 {
-    "path": "pop/",
+    "pop_path": "pop/",
+    "biome_path": "biomes/",
     "files": ["grass", "buttercup", "clover", "honeybee", "bison", "wolf",
-    "grasshopper"]
+    "grasshopper", "spider"]
 }

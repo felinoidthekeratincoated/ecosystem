@@ -10,13 +10,37 @@
 using json = nlohmann::json;
 
 enum class Species {
-    GRASS,
+    GRASS, // 0
     BUTTERCUP,
-    CLOVER,
+    RED_CLOVER,
     HONEYBEE,
     BISON,
     WOLF,
-    GRASSHOPPER
+    GRASSHOPPER,
+    SPIDER,
+    BIG_BLUESTEM,
+    INDIAN_GRASS,
+    SWITCH_GRASS, // 10
+    LITTLE_BLUESTEM,
+    PRAIRIE_CORDGRASS, 
+    GAMA_GRASS, // Has declined in range because of habitat destruction
+    PRAIRIE_DROPSEED, // Possibly leave out
+    WILD_RYE, // Possibly leave out
+    COMPASS_PLANT,
+    PRAIRIE_DOCK,
+    LEADPLANT,
+    ROSINWEED,
+    RATTLESNAKE_MASTER,
+    WILD_QUININE,
+    MISSOURI_IRONWEED,
+    GOLDENROD,
+    NEW_ENGLAND_ASTER,
+    WILD_WHITE_INDIGO,
+    HANDSOME_GRASSHOPPER,
+    SLANT_FACED_GRASSHOPPER,
+    SHORT_WINGED_TOOTHPICK_GRASSHOPPER
+    
+    
 };
 
 struct Population {

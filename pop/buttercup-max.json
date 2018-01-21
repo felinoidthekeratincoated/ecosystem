@@ -5,7 +5,7 @@
     [{
         "type": 1,
         "consumption": 1,
-        "affinity": 1
+        "affinity": 1.01
     },
     {
         "type": 8,
@@ -23,5 +23,5 @@
         "affinity": 1
     }],
     "prey": [],
-    "change_rate": 1.07
+    "change_rate": 1.06
 }

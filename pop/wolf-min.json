@@ -6,7 +6,7 @@
     [{
         "species": 4,
         "consumption": 50,
-        "catch_rate": 0.005
+        "catch_rate": 0.0005
     }],
-    "change_rate": 0.965
+    "change_rate": 0.94
 }

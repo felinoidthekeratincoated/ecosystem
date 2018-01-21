@@ -5,8 +5,8 @@
     "prey": 
     [{
         "species": 4,
-        "consumption": 50,
+        "consumption": 100,
         "catch_rate": 0.005
     }],
-    "change_rate": 0.965
+    "change_rate": 0.98
 }

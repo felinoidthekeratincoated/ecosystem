@@ -11,11 +11,11 @@ using namespace std;
 /* A class for finding initial conditions that result in a stable ecosystem. */
 class Solver {
 private:
-    int iterations;
     std::vector<Population> min_pops;
     std::vector<Population> max_pops;
-    std::vector<Population> min_goal;
-    std::vector<Population> max_goal;
+    std::vector<double> min_goal;
+    std::vector<double> max_goal;
+    std::vector<double> resources;
     std::default_random_engine engine;
     Population randomPop(const Population &low, const Population &high);
     double randrange(double low, double high);
@@ -25,8 +25,9 @@ private:
     vector<vector<Population>> &keepBest(vector<vector<Population>> &pops,
         vector<double> &errors, int keep);
 public:
-    Solver();
-    void Solve();
+    Solver(string biome);
+    void Solve(int iterations, unsigned int num_pops, int num_kept, 
+        int generations);
 };
 
 #endif

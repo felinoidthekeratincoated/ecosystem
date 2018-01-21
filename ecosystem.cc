@@ -9,10 +9,13 @@ using json = nlohmann::json;
 
 using namespace std;
 
-Ecosystem::Ecosystem() {
-    string pop_folder;
-    string suffix;
-    vector<string> filenames = GetFilenames(pop_folder, suffix);
+Ecosystem::Ecosystem(string biome) {
+    string pop_folder, bio_folder, suffix;
+    vector<string> filenames = GetFilenames(pop_folder, bio_folder, suffix);
+
+    ifstream type(bio_folder + biome + suffix);
+    json t = json::parse(type);
+    resources = t["resources"].get<vector<double>>();
 
     for (unsigned int i = 0; i < filenames.size(); i++) {
         /* open file */
@@ -25,8 +28,9 @@ Ecosystem::Ecosystem() {
     }
 }
 
-Ecosystem::Ecosystem(vector<Population> &populations) {
+Ecosystem::Ecosystem(vector<Population> &populations, vector<double> &r) {
     pops = populations;
+    resources = r;
 }
 
 /* Update the populations. */
@@ -45,6 +49,16 @@ void Ecosystem::Output(ofstream &file) const {
     file << "\n";
 }
 
+/* Write a comma-separated list of species names to the file. */
+void Ecosystem::WriteNames(ofstream &file) const {
+    string s, t, u;
+    vector<string> filenames = GetFilenames(s, t, u);
+    for (unsigned int i = 0; i < filenames.size(); i++) {
+        file << filenames[i] << ",";
+    }
+    file << "\n";
+}
+
 /* Get the status of a givem population. */
 Population Ecosystem::Get(Species species) const {
     return pops[(int)species];
@@ -52,20 +66,22 @@ Population Ecosystem::Get(Species species) const {
 
 /* Gets a list of all filenames of populations, in order, and changes the 
 string prefix to be the path to the files and suffix to be the extension. */
-vector<string> Ecosystem::GetFilenames(string &prefix, string &suffix) {
+vector<string> Ecosystem::GetFilenames(string &pop_prefix, string &bio_prefix,
+        string &suffix) {
     suffix = ".json";
 
     ifstream files("files.json");
     json f = json::parse(files);
     vector<string> filenames = f["files"].get<vector<string>>();
-    prefix = f["path"];
+    pop_prefix = f["pop_path"];
+    bio_prefix = f["biome_path"];
     return filenames;
 }
 
 /* Saves all populations to json files. */
 void Ecosystem::Save() {
-    string prefix, suffix;
-    vector<string> filenames = Ecosystem::GetFilenames(prefix, suffix);
+    string prefix, biome, suffix;
+    vector<string> filenames = Ecosystem::GetFilenames(prefix, biome, suffix);
     for (unsigned int i = 0; i < filenames.size(); i++) {
         ofstream file(prefix + filenames[i] + suffix);
         json j = pops[i];
@@ -75,12 +91,9 @@ void Ecosystem::Save() {
 
 /* Use each resource. */
 void Ecosystem::useResources() {
-    // For now, information about resources is hard-coded
-    double nitrogen = 10000;
-    useResource((ResourceType)1, 100000.0);
-    useResource((ResourceType)8, 0.0);
-    useResource((ResourceType)9, 0.0);
-    nitrogen = useResource((ResourceType)10, nitrogen);
+    for (unsigned int i = 0; i < resources.size(); i++) {
+        useResource((ResourceType)i, resources[i]);
+    }
 }
 
 /* Decrease populations that don't have enough resources for all members to
@@ -117,6 +130,9 @@ double Ecosystem::useResource(ResourceType type, double amount) {
     }
     for (unsigned int i = 0; i < users.size(); i++) {
         Population pop = pops[users[i]];
+        if (pop.size == 0) {
+            continue;
+        }
         Resource r = pop.resources[res[i]];
         double resource_used = amount * pop.size * r.affinity
                 * r.consumption / affinity;
@@ -145,14 +161,18 @@ void Ecosystem::catchPrey() {
     // Now for actually catching stuff
     for (unsigned int i = 0; i < pops.size(); i++) {
         // Ignore non-predators
-        if (pops[i].prey.size() == 0) {
+        if (pops[i].prey.size() == 0
+                || pops[i].size == 0) {
             continue;
         }
 
-        double num_predator = initial[(int)pops[i].species];
+        double num_predator = initial[i];
         // Eat the prey
         for (unsigned int j = 0; j < pops[i].prey.size(); j++) {
             Prey prey = pops[i].prey[j];
+            if (pops[(int)prey.species].size == 0) {
+                continue;
+            }
             double num_prey = initial[(int)prey.species];
             double prey_caught = num_predator * num_prey * prey.catch_rate;
             prey_caught = min(prey_caught, num_prey);
